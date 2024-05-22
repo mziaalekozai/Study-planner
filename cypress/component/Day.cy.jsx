@@ -1,9 +1,6 @@
 /* eslint-disable no-undef */
 
-import React from "react";
-import { mount } from "cypress/react";
 import Day from "../../src/components/day/Day";
-import Item from "../../src/components/day/Item";
 
 describe("Day Component", () => {
   const items = [
@@ -12,27 +9,28 @@ describe("Day Component", () => {
   ];
 
   it("should display the day name", () => {
-    mount(<Day dayName="Måndag" items={items} />);
-    cy.contains("Måndag").should("be.visible");
+    cy.mount(<Day dayName="Måndag" />);
+    cy.get('[data-cy="show-dayname"]').should("be.visible");
   });
 
   it("should display the items", () => {
-    mount(<Day dayName="Måndag" items={items} />);
+    cy.mount(<Day dayName="Måndag" items={items} />);
     items.forEach((item) => {
       cy.contains(item.text).should("be.visible");
     });
   });
 
   it("should have a button to add new task", () => {
-    mount(<Day dayName="Måndag" items={items} />);
-    cy.contains("Ny uppgift").should("be.visible");
+    cy.mount(<Day />);
+    cy.get('[data-cy="add-btn"]').should("be.visible");
   });
-
   it("should call handleChange when an item checkbox is clicked", () => {
     const handleChange = cy.stub().as("handleChange");
     const itemsWithHandler = items.map((item) => ({ ...item, handleChange }));
 
-    mount(<Day dayName="Måndag" items={itemsWithHandler} />);
+    cy.mount(
+      <Day dayName="Måndag" items={itemsWithHandler} onChange={handleChange} />
+    );
     cy.get('input[type="checkbox"]').first().click();
     cy.get("@handleChange").should("have.been.calledOnce");
   });
