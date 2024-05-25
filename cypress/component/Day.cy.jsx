@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 
 import Day from "../../src/components/day/Day";
+import { useStore } from "../../src/data/store";
 
 describe("Day Component", () => {
   const items = [
@@ -8,30 +9,45 @@ describe("Day Component", () => {
     { id: 2, text: "Lektion i skolan 9-16", done: true, late: false },
   ];
 
+  beforeEach(() => {
+    // Reset zustand store to initial state before each test
+    useStore.setState({
+      todos: items,
+      toggleTodo: (id) =>
+        useStore.setState((state) => ({
+          todos: state.todos.map((t) =>
+            t.id === id ? { ...t, done: !t.done } : t
+          ),
+        })),
+      addTodo: (newTodo) =>
+        useStore.setState((state) => ({
+          todos: [...state.todos, newTodo],
+        })),
+    });
+    cy.mount(<Day dayName="Måndag" items={useStore.getState().todos} />);
+  });
+
   it("should display the day name", () => {
-    cy.mount(<Day dayName="Måndag" />);
-    cy.get('[data-cy="show-dayname"]').should("be.visible");
+    cy.get('[data-cy="show-dayname"]')
+      .should("be.visible")
+      .and("contain.text", "Måndag");
   });
 
   it("should display the items", () => {
-    cy.mount(<Day dayName="Måndag" items={items} />);
     items.forEach((item) => {
-      cy.contains(item.text).should("be.visible");
+      cy.get('[data-cy="item"]').contains(item.text).should("be.visible");
     });
   });
 
-  it("should have a button to add new task", () => {
-    cy.mount(<Day />);
-    cy.get('[data-cy="add-btn"]').should("be.visible");
+  it("should have a button to add new task and the button should have a text", () => {
+    cy.get('[data-cy="add-btn"]')
+      .should("be.visible")
+      .and("contain.text", "Ny uppgift");
   });
-  it("should call handleChange when an item checkbox is clicked", () => {
-    const handleChange = cy.stub().as("handleChange");
-    const itemsWithHandler = items.map((item) => ({ ...item, handleChange }));
 
-    cy.mount(
-      <Day dayName="Måndag" items={itemsWithHandler} onChange={handleChange} />
-    );
-    cy.get('input[type="checkbox"]').first().click();
-    cy.get("@handleChange").should("have.been.calledOnce");
+  it("should display input and save button when 'Ny uppgift' is clicked", () => {
+    cy.get("button").contains("Ny uppgift").click();
+    cy.get("[data-cy='add-task-input']").should("be.visible");
+    cy.get("[data-cy='save-task-btn']").should("be.visible");
   });
 });
