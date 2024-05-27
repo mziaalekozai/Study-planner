@@ -1,5 +1,3 @@
-import React from "react";
-
 const PrioItem = ({ item, num }) => {
   let itemClass = "item";
   if (item.late) itemClass += " due";

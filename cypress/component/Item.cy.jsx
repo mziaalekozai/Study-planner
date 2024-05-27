@@ -9,27 +9,48 @@ describe("Item Component", () => {
     text: "Göra klart inlämning",
     done: false,
     late: false,
+    day: "ti", // Lägger till day fältet här
   };
 
   beforeEach(() => {
+    useStore.setState({
+      todos: [item],
+    });
     cy.mount(
       <Item
-        item={{ id: 1, text: "Göra klart inlämning", done: false, late: false }}
-        handleChange={() => useStore.getState().toggleTodo(1)}
-        handleRemove={() => useStore.getState().removeTodo(1)}
-        handleEdit={(newText) => useStore.getState().editTodo(1, newText)}
+        item={item}
+        handleChange={() => useStore.getState().toggleTodo(item.id)}
+        handleRemove={() => useStore.getState().removeTodo(item.id)}
+        handleEdit={(newText) => useStore.getState().editTodo(item.id, newText)}
       />
     );
   });
 
+  it("should snooze the item to the next day", () => {
+    cy.get('[data-cy="item-text"]').should(
+      "contain.text",
+      "Göra klart inlämning"
+    );
+    cy.get("[data-cy='snooza-btn']").click();
+
+    cy.then(() => {
+      const snoozedItem = useStore
+        .getState()
+        .todos.find((t) => t.id === item.id);
+      expect(snoozedItem.day).to.equal("on");
+    });
+  });
+
   it("should display the item text", () => {
-    // cy.get('[data-cy="item-text"]').should("contain.text", item.text);
     cy.get('[data-cy="item-text"]').contains(item.text);
   });
 
   it("should display the item as done when checkbox is checked", () => {
-    item.done = true;
-    cy.mount(<Item item={item} />);
+    const doneItem = { ...item, done: true };
+    useStore.setState({
+      todos: [doneItem],
+    });
+    cy.mount(<Item item={doneItem} />);
     cy.get('input[type="checkbox"]').should("be.checked");
   });
 
@@ -55,6 +76,7 @@ describe("Item Component", () => {
     cy.get('[data-cy="edit-btn"]').click();
     cy.get('[data-cy="edit-input"]').clear().type(newText);
     cy.get('[data-cy="save-btn"]').click();
+    cy.get("@handleEdit").should("have.been.calledOnceWith", newText);
     cy.wait(500); // Lägg till en kort fördröjning
   });
 });

@@ -13,6 +13,28 @@ describe("Header", () => {
     cy.get("h1").contains("Min vecka").should("be.visible");
     cy.get("button").contains("Starta om vecka").should("be.visible");
   });
+  it("should have a restart button", () => {
+    cy.get("button").contains("Starta om vecka").should("be.visible");
+  });
+  it("should have a start next week button", () => {
+    cy.get("button").contains("Starta nästa vecka").should("be.visible");
+  });
+});
+
+describe("Summary Component", () => {
+  beforeEach(() => {
+    cy.visit("/");
+  });
+
+  it("should display the summary of todos", () => {
+    cy.get(".summary").should("be.visible");
+    cy.get(".summary").should("contain.text", "klara");
+  });
+
+  it("should update the summary when todos are toggled", () => {
+    cy.get('[data-cy="show-checkbox"]').first().click();
+    cy.get(".summary").should("contain.text", "2/6 klara");
+  });
 });
 
 describe("Days of the week", () => {
@@ -58,6 +80,9 @@ describe("Days of the week", () => {
   });
   it("should have a 🗑️ delete button", () => {
     cy.get("[data-cy='remove-btn']").contains("🗑️").should("be.visible");
+  });
+  it("should have an 💤 Snooza button", () => {
+    cy.get("[data-cy='snooza-btn']").contains("💤").should("be.visible");
   });
 });
 

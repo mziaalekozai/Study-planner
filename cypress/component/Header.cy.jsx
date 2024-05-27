@@ -7,14 +7,26 @@ describe("Header Component", () => {
   beforeEach(() => {
     useStore.setState({
       todos: [
-        { id: 1, text: "Göra klart inlämning", done: false, late: false },
-        { id: 2, text: "Lektion i skolan 9-16", done: true, late: false },
+        {
+          id: 1,
+          text: "Göra klart inlämning",
+          done: true,
+          late: false,
+          day: "må",
+        },
+        {
+          id: 2,
+          text: "Lektion i skolan 9-16",
+          done: true,
+          late: false,
+          day: "må",
+        },
       ],
     });
     cy.mount(
       <>
         <Header />
-        <Day dayName="Måndag" items={useStore.getState().todos} />
+        <Day dayName="Måndag" dayShortName="må" />
       </>
     );
   });
@@ -25,5 +37,11 @@ describe("Header Component", () => {
 
   it("should display the restart week button with correct text", () => {
     cy.get(".restart-week").contains("Starta om vecka").should("be.visible");
+  });
+
+  it("should display the start next week button with correct text", () => {
+    cy.get(".start-next-week")
+      .contains("Starta nästa vecka")
+      .should("be.visible");
   });
 });

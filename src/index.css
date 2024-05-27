@@ -57,8 +57,18 @@ header {
   border-bottom: 1px solid black;
   margin-bottom: 0.4rem;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
+header .start-next-week {
+  position: absolute;
+  right: 11em;
+  top: 0.2em;
+  background-color: var(--c1);
+  color: var(--c2);
+  border: 1px solid var(--c2);
+}
 header .restart-week {
   position: absolute;
   right: 0.2em;
@@ -67,7 +77,11 @@ header .restart-week {
   color: var(--c2);
   border: 1px solid var(--c2);
 }
-
+.summary {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
 .day-view {
   display: flex;
   flex-direction: row;
