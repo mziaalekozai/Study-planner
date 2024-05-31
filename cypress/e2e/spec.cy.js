@@ -62,17 +62,18 @@ describe("Todo Application E2E Tests", () => {
   });
 
   it("should update the text of the first todo item", () => {
+    const newText = "e2e rules";
     // Leta upp första todo item som visas, klicka på pennan
     cy.get('[data-cy="edit-btn"]').first().click();
 
     // Skriv "e2e rules" i textboxen
-    cy.get('[data-cy="edit-input"]').clear().type("e2e rules");
+    cy.get('[data-cy="edit-input"]').clear().type(newText);
 
     // Klicka på "spara" knappen
     cy.get('[data-cy="save-btn"]').click();
 
     // Kontrollera att texten nu har ändrats till "e2e rules"
-    cy.get('[data-cy="item-text"]').first().should("contain.text", "e2e rules");
+    cy.get('[data-cy="item-text"]').first().should("contain.text", newText);
   });
 
   it("should remove a todo item", () => {
