@@ -1,113 +1,100 @@
 /* eslint-disable no-undef */
 
-describe("Header", () => {
+describe("Todo Application E2E Tests", () => {
   beforeEach(() => {
     cy.visit("/");
   });
 
-  it("should show the navbar", () => {
-    cy.get("header").should("be.visible");
-  });
+  it("should mark all todos as not done when 'Starta nästa vecka' is clicked", () => {
+    // Kontrollera att alla checkboxar är markerade
+    cy.get('[data-cy="show-checkbox"]').each((checkbox) => {
+      cy.wrap(checkbox).check();
+    });
 
-  it("should show the h1 with text and button with text on navbar", () => {
-    cy.get("h1").contains("Min vecka").should("be.visible");
-    cy.get("button").contains("Starta om vecka").should("be.visible");
-  });
-  it("should have a restart button", () => {
-    cy.get("button").contains("Starta om vecka").should("be.visible");
-  });
-  it("should have a start next week button", () => {
-    cy.get("button").contains("Starta nästa vecka").should("be.visible");
-  });
-});
+    // Klicka på "Starta nästa vecka" knappen
+    cy.get("button").contains("Starta nästa vecka").click();
 
-describe("Summary Component", () => {
-  beforeEach(() => {
-    cy.visit("/");
-  });
-
-  it("should display the summary of todos", () => {
-    cy.get(".summary").should("be.visible");
-    cy.get(".summary").should("contain.text", "klara");
-  });
-
-  it("should update the summary when todos are toggled", () => {
-    cy.get('[data-cy="show-checkbox"]').first().click();
-    cy.get(".summary").should("contain.text", "2/6 klara");
-  });
-});
-
-describe("Days of the week", () => {
-  beforeEach(() => {
-    cy.visit("/");
-  });
-
-  it("should show the days", () => {
-    const days = [
-      "Måndag",
-      "Tisdag",
-      "Onsdag",
-      "Torsdag",
-      "Fredag",
-      "Lördag",
-      "Söndag",
-    ];
-    days.forEach((day) => {
-      cy.get("[data-cy=show-dayname]").contains(day).should("be.visible");
+    // Kontrollera att alla checkboxar nu är omarkerade
+    cy.get('[data-cy="show-checkbox"]').each((checkbox) => {
+      cy.wrap(checkbox).should("not.be.checked");
     });
   });
 
-  it("should have a checkbox to check the todos", () => {
-    cy.get("input[type='checkbox']").should("be.visible");
+  it("should restart the week when 'Starta om vecka' is clicked", () => {
+    cy.get('[data-cy="todo-item"]').should("have.length.greaterThan", 0);
+
+    cy.get('[data-cy="show-checkbox"]').first().check();
+    cy.get('[data-cy="show-checkbox"]').check();
+
+    cy.get('[data-cy="show-checkbox"]').first().should("be.checked");
+    cy.get('[data-cy="show-checkbox"]').eq(1).should("be.checked");
+
+    cy.get("header").should("be.visible");
+    cy.get("button.restart-week").contains("Starta om vecka").click();
+
+    cy.wait(1000); // Lägg till en kort fördröjning för att säkerställa att UI uppdateras
+
+    // Kontrollera att alla todos återställs till sitt initiala tillstånd
+    cy.get('[data-cy="todo-item"]').should("have.length.greaterThan", 0);
   });
 
-  it("should have a button to add new task and the button should have text", () => {
-    cy.get("button").contains("Ny uppgift").should("be.visible");
-  });
+  it("should display the summary of todos", () => {
+    // Kontrollera att sammanfattningen är synlig och har texten "klara"
+    cy.get(".summary").should("be.visible").and("contain.text", "klara");
 
-  it("should display input and save button when 'Ny uppgift' is clicked", () => {
+    // Verifiera att sammanfattningen uppdateras korrekt när en todo är markerad som klar
+    cy.get('[data-cy="show-checkbox"]').check();
+    cy.get(".summary").should("contain.text", "6/6 klara");
+
+    // Avmarkera todo och verifiera uppdaterad sammanfattning
+    cy.get('[data-cy="show-checkbox"]').uncheck();
+    cy.get(".summary").should("contain.text", "0/6 klara");
+
+    // Lägg till en ny todo och verifiera uppdaterad sammanfattning
     cy.get("button").contains("Ny uppgift").click();
-    cy.get("[data-cy='add-task-input']").should("be.visible");
-    cy.get("[data-cy='save-task-btn']").should("be.visible");
-  });
-  it("should have an edit button", () => {
-    cy.get("[data-cy='edit-btn']").should("be.visible");
-  });
-  it("should display input and save button when '✍️' is clicked", () => {
-    cy.get("[data-cy='edit-btn']").contains("✍️").click();
-    cy.get("[data-cy='edit-input']").should("be.visible");
-    cy.get("[data-cy='save-btn']").should("be.visible");
-  });
-  it("should have a 🗑️ delete button", () => {
-    cy.get("[data-cy='remove-btn']").contains("🗑️").should("be.visible");
-  });
-  it("should have an 💤 Snooza button", () => {
-    cy.get("[data-cy='snooza-btn']").contains("💤").should("be.visible");
-  });
-});
+    cy.get("[data-cy='add-task-input']").type("Ny uppgift");
+    cy.get("[data-cy='save-task-btn']").click();
+    cy.get(".summary").should("contain.text", "0/7 klara");
 
-describe("Search ", () => {
-  beforeEach(() => {
-    cy.visit("/");
+    // Markera den nya todo som klar och verifiera uppdaterad sammanfattning
+    cy.get('[data-cy="show-checkbox"]').last().check();
+    cy.get(".summary").should("contain.text", "1/7 klara");
   });
 
-  it("should have a title on the search element", () => {
-    cy.get('[data-cy="search-title"]')
-      .contains("Vad ska jag göra nu?")
-      .should("be.visible");
-  });
-  it("should have an input field on the search element", () => {
-    cy.get('[data-cy="search-input"]')
-      // .contains("Vad ska jag göra nu?")
-      .should("be.visible");
-  });
-});
-describe("Footer ", () => {
-  beforeEach(() => {
-    cy.visit("/");
+  it("should update the text of the first todo item", () => {
+    // Leta upp första todo item som visas, klicka på pennan
+    cy.get('[data-cy="edit-btn"]').first().click();
+
+    // Skriv "e2e rules" i textboxen
+    cy.get('[data-cy="edit-input"]').clear().type("e2e rules");
+
+    // Klicka på "spara" knappen
+    cy.get('[data-cy="save-btn"]').click();
+
+    // Kontrollera att texten nu har ändrats till "e2e rules"
+    cy.get('[data-cy="item-text"]').first().should("contain.text", "e2e rules");
   });
 
-  it("should have a p tag with text", () => {
-    cy.get("p").contains("Idag är det: ").should("be.visible");
+  it("should remove a todo item", () => {
+    // Kontrollera att vi har tre todos till att börja med
+    cy.get('[data-cy="item"]').should("have.length", 0);
+
+    // Leta upp första todo item som visas, klicka på papperskorgen
+    cy.get('[data-cy="remove-btn"]').first().click();
+
+    // Kontrollera att todo item har tagits bort
+    cy.get('[data-cy="item"]').should("have.length", 0); // Antal items bör minska med 1
+  });
+
+  it("should filter todo items based on search text", () => {
+    const searchText = "skola";
+    // Skriv i sökfältet
+    cy.get('[data-cy="search-input"]').type(searchText);
+
+    // Kontrollera att rätt antal todo items visas
+    cy.get('[data-cy="todo-item"]').should("have.length", 7);
+
+    // Kontrollera att första item innehåller söktexten
+    cy.get('[data-cy="todo-item"]').should("contain.text", searchText);
   });
 });

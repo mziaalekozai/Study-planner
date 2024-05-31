@@ -32,7 +32,6 @@ const Day = ({ dayName, dayShortName, items = [] }) => {
       <h2 data-cy="show-dayname">{dayName}</h2>
       {items.map((item) => (
         <Item
-          data-cy="show-item"
           key={item.id}
           item={item}
           handleChange={() => toggleTodo(item.id)}

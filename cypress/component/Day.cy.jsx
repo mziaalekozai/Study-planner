@@ -35,7 +35,7 @@ describe("Day Component", () => {
 
   it("should display the items", () => {
     items.forEach((item) => {
-      cy.get('[data-cy="item"]').contains(item.text).should("be.visible");
+      cy.get('[data-cy="todo-item"]').contains(item.text).should("be.visible");
     });
   });
 

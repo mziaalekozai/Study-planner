@@ -24,7 +24,7 @@ const Item = ({ item, handleChange, handleRemove, handleEdit }) => {
   if (item.late) itemClass += " due";
 
   return (
-    <div className="item" data-cy="item">
+    <div className="item" data-cy="todo-item">
       <input
         data-cy="show-checkbox"
         type="checkbox"

@@ -2,18 +2,23 @@ import { useStore } from "../data/store.js";
 
 const Header = () => {
   const restartWeek = useStore((state) => state.restartWeek);
-  const startNextWeek = useStore((state) => {
-    const todos = state.todos.map((todo) => ({ ...todo, done: false }));
-    return () => state.setTodos(todos);
-  });
+  const startNextWeek = useStore((state) => state.startNextWeek);
 
   return (
     <header>
       <h1>Min vecka</h1>
-      <button className="restart-week" onClick={restartWeek}>
+      <button
+        className="restart-week"
+        onClick={restartWeek}
+        data-cy="restart-week"
+      >
         Starta om vecka
       </button>
-      <button className="start-next-week" onClick={startNextWeek}>
+      <button
+        className="start-next-week"
+        onClick={startNextWeek}
+        data-cy="start-next-week"
+      >
         Starta nästa vecka
       </button>
     </header>
